@@ -1,36 +1,54 @@
 import matplotlib.pyplot as plt
 import numpy as np
-def plot(fm,fc):
-    t=np.linspace(0,1,1000)
-    
-    ms=np.sin(2*np.pi*fm*t)
-    cs=np.sin(2*np.pi*fc*t)
 
-    am_signal=(1+ms)*cs
-    kf=5
-    fm_signal=np.sin(2*np.pi*fc*t+kf*np.cumsum(ms)/len(t))
-    kp=np.pi
-    pm_signal=np.sin(2*np.pi*fc*t+kp*ms)
+fs = 10000
+bit_input = input("Enter bits (e.g. 10101): ")
+bits = [int(b) for b in bit_input]
 
-    plt.figure(figsize=(10,10))
+Tb = 0.01  # smaller bit duration for clear waveform
+t_bits = np.arange(0, Tb, 1/fs)
 
-    plt.subplot(4,1,1)
-    plt.title("AM")
-    plt.xlabel("amplitude")
-    plt.ylabel("Time")
-    plt.plot(t,am_signal,color='r')
-    plt.grid(True)
-    plt.subplot(4,1,3)
-    plt.title("FM")
-    plt.xlabel("amplitude")
-    plt.ylabel("Time")
-    plt.plot(t,fm_signal,color='g')
-    plt.grid(True)
-    
-    plt.tight_layout()
-    plt.subplots_adjust(hspace=.08)
-    plt.show()
+bpsk = []
+ask = []
+fsk = []
 
-fc=float(input("enter fc"))
-fm=float(input("enter fm"))
-plot(fm,fc)
+# Better separated frequencies
+f0 = 500
+fc = 2000
+
+for b in bits:
+    if b == 1:
+        bpsk.extend(np.cos(2*np.pi*fc*t_bits))
+        ask.extend(np.cos(2*np.pi*fc*t_bits))
+        fsk.extend(np.cos(2*np.pi*fc*t_bits))
+    else:
+        bpsk.extend(-np.cos(2*np.pi*fc*t_bits))
+        ask.extend(np.zeros(len(t_bits)))
+        fsk.extend(np.cos(2*np.pi*f0*t_bits))
+
+bpsk = np.array(bpsk)
+ask = np.array(ask)
+fsk = np.array(fsk)
+
+# Proper time scaling
+t = np.linspace(0, Tb*len(bits), len(bpsk))
+
+plt.figure(figsize=(10, 8))
+
+plt.subplot(3,1,1)
+plt.plot(t, bpsk)
+plt.title("BPSK Signal")
+plt.grid()
+
+plt.subplot(3,1,2)
+plt.plot(t, ask)
+plt.title("ASK Signal")
+plt.grid()
+
+plt.subplot(3,1,3)
+plt.plot(t, fsk)
+plt.title("FSK Signal")
+plt.grid()
+
+plt.tight_layout()
+plt.show()
