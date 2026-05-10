@@ -18,6 +18,7 @@ while (2 ** r) < (m + r + 1):
 
 # create hamming structure
 hamming = []
+
 j = 0
 k = 0
 
@@ -32,7 +33,7 @@ for i in range(1, m + r + 1):
         hamming.append(int(data[k]))
         k += 1
 
-# calculate parity
+# calculate parity bits
 for i in range(r):
 
     pos = 2 ** i
@@ -45,6 +46,7 @@ for i in range(r):
 
     hamming[pos - 1] = 0 if count % 2 == 0 else 1
 
+# final hamming code
 encoded = ''.join(map(str, hamming))
 
 print("\nHamming Code:", encoded)
@@ -54,11 +56,12 @@ print("\nHamming Code:", encoded)
 
 received = input("\nEnter received code: ")
 
-
+# convert string to integer list
+received = list(map(int, received))
 
 error_pos = 0
 
-# check parity
+# parity checking
 for i in range(r):
 
     pos = 2 ** i
@@ -69,6 +72,7 @@ for i in range(r):
         if (j + 1) & pos:
             count += received[j]
 
+    # parity mismatch
     if count % 2 != 0:
         error_pos += pos
 
